@@ -1,0 +1,13 @@
+==Run the application== 
+docker-compose --env-file .env up
+docker-compose --env-file .env up aplazo_postgresql_container
+docker-compose --env-file .env up spring-app
+==Docker connection==
+docker exec -it aplazo_postgresql_container bash
+==Database connection==
+psql -U aplazo
+\l
+\c aplazo
+\dt
+http://localhost:8080/swagger-ui/index.html#/
+http://localhost:8080/v3/api-docs
