@@ -2,6 +2,7 @@ package com.mx.aplazo.BNPL.service;
 
 import com.mx.aplazo.BNPL.dto.*;
 import com.mx.aplazo.BNPL.exception.NotFoundCustomerException;
+import com.mx.aplazo.BNPL.exception.NotFoundLoanException;
 import com.mx.aplazo.BNPL.model.Customer;
 import com.mx.aplazo.BNPL.model.Installment;
 import com.mx.aplazo.BNPL.model.Loan;
@@ -30,7 +31,7 @@ public class LoanService {
 
     @Transactional
     public LoanResponse create(LoanRequest loanRequest) {
-        UUID customerUUID = GeneralPurpose.converStringToUUID(loanRequest.getCustomerId());
+        UUID customerUUID = GeneralPurpose.converCustomerIdToUUID(loanRequest.getCustomerId());
         Customer customer = customerRepository.findById(customerUUID)
                 .orElseThrow(() -> new NotFoundCustomerException("customerId is not match"));
         BigDecimal loanAmount = GeneralPurpose.validateCreditLine(loanRequest.getAmount(), customer.getCreditLineAvailable());
@@ -52,7 +53,7 @@ public class LoanService {
                 commissionAmount,
                 loanTotalAmount,
                 installments
-                );
+        );
         loanRepository.save(loan);
 
         customer.setCreditLineAvailable(customer.getCreditLineAvailable().subtract(loanAmount));
@@ -73,9 +74,24 @@ public class LoanService {
         loanResponse.setPaymentPlan(paymentPlan);
 
         return loanResponse;
-
-
     }
 
+    @Transactional
+    public LoanResponse getLoanById(String loanId) {
+        UUID loanUUID = GeneralPurpose.converLoanIdToUUID(loanId);
+        Loan loan = loanRepository.findById(loanUUID)
+                .orElseThrow(() -> new NotFoundLoanException("loanId is not match"));
+        PaymentPlan paymentPlan = new PaymentPlan();
+        paymentPlan.setCommissionAmount(loan.getCommissionAmount());
+        paymentPlan.setInstallmentResponse((InstallmentResponse) loan.getInstallments());
 
+        LoanResponse loanResponse = new LoanResponse();
+        loanResponse.setId(String.valueOf(loan.getId()));
+        loanResponse.setCustomerId(String.valueOf(loan.getCustomer().getId()));
+        loanResponse.setEstatus(String.valueOf(loan.getLoanStatus()));
+        loanResponse.setCreatedAt(String.valueOf(loan.getCreatedAt()));
+        loanResponse.setPaymentPlan(paymentPlan);
+
+        return loanResponse;
+    }
 }

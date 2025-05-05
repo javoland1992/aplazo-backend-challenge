@@ -1,9 +1,6 @@
 package com.mx.aplazo.BNPL.util;
 
-import com.mx.aplazo.BNPL.exception.InvalidAgeException;
-import com.mx.aplazo.BNPL.exception.InvalidCreditLineException;
-import com.mx.aplazo.BNPL.exception.InvalidDateInput;
-import com.mx.aplazo.BNPL.exception.NotFoundCustomerException;
+import com.mx.aplazo.BNPL.exception.*;
 import com.mx.aplazo.BNPL.model.Customer;
 import com.mx.aplazo.BNPL.model.Installment;
 import jakarta.validation.constraints.NotBlank;
@@ -38,11 +35,19 @@ public class GeneralPurpose {
         return uri.substring(0, lastSlashIndex);
     }
 
-    public static UUID converStringToUUID(String customerId) {
+    public static UUID converCustomerIdToUUID(String customerId) {
         try {
             return UUID.fromString(customerId);
         } catch (IllegalArgumentException e) {
             throw new NotFoundCustomerException("customerId is not match");
+        }
+    }
+
+    public static UUID converLoanIdToUUID(String loanId) {
+        try {
+            return UUID.fromString(loanId);
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundLoanException("loanId is not match");
         }
     }
 
