@@ -51,7 +51,7 @@ public class CustomerService {
 
     @Transactional
     public CustomerResponse getCustomerById(String customerId){
-        UUID customerUUID = GeneralPurpose.converStringToUUID(customerId);
+        UUID customerUUID = GeneralPurpose.converCustomerIdToUUID(customerId);
         Optional<Customer> clientOptional = customerRepository.findById(customerUUID);
         if (clientOptional.isPresent()) {
             Customer customer = clientOptional.get();
