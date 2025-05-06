@@ -1,10 +1,6 @@
 package com.mx.aplazo.BNPL.config;
 
-import com.mx.aplazo.BNPL.exception.InvalidAgeException;
-import com.mx.aplazo.BNPL.exception.InvalidCreditLineException;
-import com.mx.aplazo.BNPL.exception.InvalidDateInput;
-import com.mx.aplazo.BNPL.exception.NotFoundCustomerException;
-import com.mx.aplazo.BNPL.exception.NotFoundLoanException;
+import com.mx.aplazo.BNPL.exception.*;
 import com.mx.aplazo.BNPL.util.GeneralPurpose;
 import jakarta.servlet.http.HttpServletRequest;
 import org.antlr.v4.runtime.atn.ErrorInfo;
@@ -120,5 +116,18 @@ public class GlobalExceptionHandler {
         String pathPrint = GeneralPurpose.removeLastSegment(request.getRequestURI()) + "/invalid-uuid";
         errors.put("path",pathPrint);
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(UsernameAlreadyTakenException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<Object> handleUsernameAlreadyTakenException(
+            UsernameAlreadyTakenException ex, HttpServletRequest request) {
+        Map<String, Object> errors = new LinkedHashMap<>();
+        errors.put("code", "APZ000010");
+        errors.put("error", "INVALID_USER_REQUEST");
+        errors.put("timestamp", LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond());
+        errors.put("message", ex.getMessage());
+        errors.put("path", request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errors);
     }
 }
